@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js & color scale-->
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+
+
+<script>
+
+// set the dimensions and margins of the graph
+var margin = {top: 0, right: 30, bottom: 0, left: 20},
+    width = 760 - margin.left - margin.right,
+    height = 800 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
+
+var parseDate = d3.timeParse("%Y-%m-%d");
+
+
+// Parse the Data
+d3  .csv("theme_river_withoutAxieInfinity.csv",function(data){
+
+    // .row(function(d){return {date: parseDate(d.date),
+    //                          price: Number(d.price.trim().slice(1))};})
+    
+        // List of groups = header of the csv files
+        var keys = data.columns.slice(1)
+        console.log(keys)
+        // Add X axis
+        var minDate = d3.min(data,function(d){return parseDate(d.month);});
+        var maxDate = d3.max(data,function(d){return parseDate(d.month);});
+
+        var mid_axis = [parseDate("2018-3-1"),
+                        parseDate("2018-12-1"),
+                        parseDate("2019-6-1"), parseDate("2019-12-1"),
+                        parseDate("2020-6-1"), parseDate("2020-12-1"),
+                        parseDate("2021-6-1"), 
+                        parseDate("2022-3-1")]
+        
+        console.log(mid_axis)
+
+        console.log(maxDate); 
+        console.log(minDate);
+        console.log(d3.extent(data, function(d) { return parseDate(d.month); }))
+
+        var x = d3  .scaleTime()
+                    .domain(d3.extent(data, function(d) { return parseDate(d.month); }))
+                    .range([ 0, width ]);
+
+        console.log(x)
+
+        svg .append("g")
+            .attr("transform", "translate(0," + height*0.8 + ")")
+            .call(d3.axisBottom(x).tickSize(-height*.7).tickValues(mid_axis))
+            .select(".domain").remove()
+
+        
+        // Customization
+
+        svg.selectAll(".tick line").attr("stroke", "#b8b8b8")
+
+        // Add X axis label:
+        svg.append("text")
+            .attr("text-anchor", "end")
+            .attr("x", width-15)
+            .attr("y", height-120 )
+            .text("Time: Mar. 2018 -- Mar. 2022");
+
+        // Add Y axis
+        var y = d3  .scaleLinear()
+                    .domain([-1.8, 1.5])
+                    .range([height, 0]);
+
+        
+        // console.log(y)
+
+        var yAxis = d3.axisLeft(y); 
+        // var xAxis = d3.axisBottom(x);
+
+        // color palette
+        var color = d3.scaleOrdinal()
+                      .domain(keys)
+                      .range(d3.schemeAccent);
+
+        //stack the data?
+        var stackedData = d3.stack()
+            .offset(d3.stackOffsetSilhouette)
+            .keys(keys)
+            (data)
+        console.log(stackedData)
+        // create a tooltip
+        var Tooltip = svg
+            .append("text")
+            .attr("x", 120)
+            .attr("y", 200)
+            .style("opacity", 0)
+            .style("font-size", 30)
+            .style("font-family","Impact")
+            .style("fill","Orange")
+        
+
+        // Three function that change the tooltip when user hover / move / leave a cell
+        var mouseover = function(d) {
+            Tooltip.style("opacity", 1)
+            d3.selectAll(".myArea").style("opacity", .2)
+            d3.select(this)
+            .style("stroke", "black")
+            .style("opacity", 1)
+        }
+        var mousemove = function(d,i) {
+            grp = keys[i]
+            Tooltip.text(grp)
+        }
+        var mouseleave = function(d) {
+            Tooltip.style("opacity", 0)
+            d3.selectAll(".myArea").style("opacity", 1).style("stroke", "none")
+        }
+
+        // Area generator
+        var area = d3.area()
+            .x(function(d) { return x(parseDate(d.data.month)); })
+            .y0(function(d) { return y(d[0]); })
+            .y1(function(d) { return y(d[1]); })
+        console.log(area)
+
+
+        svg .append('text')
+            .attr('x',5)
+            .attr('y',90)
+            .text('Popularity_Scope')
+            .style("fill", "black")
+            .attr('font-size',15);
+
+        svg .append('text')
+            .attr('x',110)
+            .attr('y',125)
+            .text('Theme River: Topic Temporal Variation')
+            .style("fill", "black")
+            .attr('font-size',30);
+
+        svg .append('text')
+            .attr('x',50)
+            .attr('y',625)
+            .text('2018')
+            .style("fill", "black")
+            .attr('font-size',25);
+        
+        svg .append('text')
+            .attr('x',196)
+            .attr('y',625)
+            .text('2019')
+            .style("fill", "black")
+            .attr('font-size',25);
+        
+        svg .append('text')
+            .attr('x',375)
+            .attr('y',625)
+            .text('2020')
+            .style("fill", "black")
+            .attr('font-size',25);
+        
+        svg .append('text')
+            .attr('x',554)
+            .attr('y',625)
+            .text('2021')
+            .style("fill", "black")
+            .attr('font-size',25);
+        
+        svg .append('text')
+            .attr('x',680)
+            .attr('y',625)
+            .text('2022')
+            .style("fill", "black")
+            .attr('font-size',25);
+
+
+        // Show the areas
+        svg
+            .selectAll("mylayers")
+            .data(stackedData)
+            .enter()
+            .append("path")
+            .attr("class", "myArea")
+            .style("fill", function(d) { return color(d.key); })
+            .attr("d", area)
+            .on("mouseover", mouseover)
+            .on("mousemove", mousemove)
+            .on("mouseleave", mouseleave)
+
+})
+</script>

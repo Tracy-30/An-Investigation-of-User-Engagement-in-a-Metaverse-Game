@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+
+<!-- Load d3-cloud -->
+<script src="d3.layout.cloud.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+
+
+<body>
+
+    <form>
+    Select Top N Hottest KeyWords You want to Visualize :) ->
+    <select id="mySelect">
+      <option>25</option>
+      <option>50</option>
+      <option>75</option>
+      <option>100</option>
+      <option>125</option>
+      <option>150</option>
+    </select>
+    <br><br>
+    <input type="button" onclick="generate_wordcloud()" value="Apply">
+    </form>
+    
+
+</body>
+
+<script>
+
+// Generated Data with NLP techniques
+var myWords = [
+{word: "AXIEINFINITY", size: "1043", colo: "#000099"},
+{word: "AXIE", size: "269", colo: "#000099"},
+{word: "GAMING", size: "86", colo: "#000099"},
+{word: "ETHEREUM", size: "84", colo: "#000099"},
+{word: "@JIHOZ_AXIE", size: "55", colo: "#000099"},
+{word: "BLOCKCHAIN", size: "55", colo: "#000099"},
+{word: "CRYPTOKITTIES", size: "42", colo: "#000099"},
+{word: "AXIEINFINITYJA", size: "38", colo: "#000099"},
+{word: "DAPPS", size: "37", colo: "#000099"},
+{word: "NFT", size: "33", colo: "#000099"},
+{word: "GODS UNCHAINED", size: "28", colo: "#000099"},
+{word: "SLP", size: "27", colo: "#000099"},
+{word: "AXS", size: "26", colo: "#000099"},
+{word: "CRYPTO", size: "25", colo: "#000099"},
+{word: "DECENTRALAND", size: "23", colo: "#000099"},
+{word: "CHECK", size: "21", colo: "#000099"},
+{word: "OFFICALDLIVE", size: "20", colo: "#000099"},
+{word: "LIVE", size: "18", colo: "#000099"},
+{word: "MY CRYPTO HEROES", size: "18", colo: "#000099"},
+{word: "OPENSEA", size: "17", colo: "#000099"},
+{word: "LAND", size: "14", colo: "#000099"},
+{word: "AXIE EGG", size: "14", colo: "#000099"},
+{word: "0XUNIVERSE", size: "14", colo: "#000099"},
+{word: "TEAM", size: "14", colo: "#000099"},
+{word: "COMMUNITY", size: "14", colo: "#000099"},
+{word: "THANKS", size: "13", colo: "#000099"},
+{word: "NONFUNGIBLES", size: "12", colo: "#000099"},
+{word: "GIVEAWAY", size: "12", colo: "#000099"},
+{word: "AMP", size: "12", colo: "#000099"},
+{word: "DE", size: "12", colo: "#000099"},
+{word: "NEONDISTRICTRPG", size: "12", colo: "#000099"},
+{word: "BATTLE", size: "11", colo: "#000099"},
+{word: "@3XHUMAN", size: "11", colo: "#000099"},
+{word: "BLOCKCHAIN CUTIES", size: "10", colo: "#3d4db8"},
+{word: "GREAT", size: "10", colo: "#3d4db8"},
+{word: "CS-COMMANDER", size: "9", colo: "#3d4db8"},
+{word: "PLAY", size: "9", colo: "#3d4db8"},
+{word: "SEASON", size: "9", colo: "#3d4db8"},
+{word: "TOP", size: "9", colo: "#3d4db8"},
+{word: "RCTECH BATTLES", size: "9", colo: "#3d4db8"},
+{word: "BETA", size: "9", colo: "#3d4db8"},
+{word: "SCHOLARSHIP", size: "9", colo: "#3d4db8"},
+{word: "BINANCE", size: "9", colo: "#3d4db8"},
+{word: "TOURNAMENT", size: "9", colo: "#3d4db8"},
+{word: "CLOUDWHITEVEN", size: "9", colo: "#3d4db8"},
+{word: "ZENZO ECOSYSTEM", size: "8", colo: "#3d4db8"},
+{word: "CONGRATS", size: "8", colo: "#3d4db8"},
+{word: "@GABUSCH", size: "8", colo: "#3d4db8"},
+{word: "AXIE44", size: "8", colo: "#3d4db8"},
+{word: "LOVE", size: "8", colo: "#3d4db8"},
+{word: "STREAM", size: "7", colo: "#3d4db8"},
+{word: "CRYPTOVOXELS", size: "7", colo: "#3d4db8"},
+{word: "THESANDBOXGAME", size: "7", colo: "#3d4db8"},
+{word: "BRYCENT", size: "7", colo: "#3d4db8"},
+{word: "DAPP", size: "7", colo: "#3d4db8"},
+{word: "CRYPTOINKJP", size: "7", colo: "#3d4db8"},
+{word: "DISCORD", size: "6", colo: "#3d4db8"},
+{word: "GOING", size: "6", colo: "#3d4db8"},
+{word: "LTZONDA", size: "6", colo: "#3d4db8"},
+{word: "PSYCHEOUT86", size: "6", colo: "#3d4db8"},
+{word: "HOLDENSPORTS", size: "6", colo: "#3d4db8"},
+{word: "PLAYING", size: "6", colo: "#3d4db8"},
+{word: "BATTLERACERS", size: "6", colo: "#3d4db8"},
+{word: "ENJIN", size: "6", colo: "#3d4db8"},
+{word: "BATTLES", size: "6", colo: "#3d4db8"},
+{word: "SUPERRARECO", size: "6", colo: "#3d4db8"},
+{word: "THANK", size: "6", colo: "#3d4db8"},
+{word: "NEXT", size: "6", colo: "#3d4db8"},
+{word: "NFTS", size: "6", colo: "#3d4db8"},
+{word: "SIR", size: "6", colo: "#3d4db8"},
+{word: "CONTEST", size: "6", colo: "#7a99d6"},
+{word: "CLOUDWHITEWHALE", size: "6", colo: "#7a99d6"},
+{word: "PETHEREUM", size: "5", colo: "#7a99d6"},
+{word: "GENIUS", size: "5", colo: "#7a99d6"},
+{word: "DJSAMWITHERS", size: "5", colo: "#7a99d6"},
+{word: "TIME", size: "5", colo: "#7a99d6"},
+{word: "LOOMNETWORK", size: "5", colo: "#7a99d6"},
+{word: "RARIBLECOM", size: "5", colo: "#7a99d6"},
+{word: "MYSTIC", size: "5", colo: "#7a99d6"},
+{word: "COME", size: "5", colo: "#7a99d6"},
+{word: "JOSHBAKED", size: "5", colo: "#7a99d6"},
+{word: "JOIN US", size: "5", colo: "#7a99d6"},
+{word: "CHIBIFIGHTERS", size: "5", colo: "#7a99d6"},
+{word: "MAKERDAO", size: "5", colo: "#7a99d6"},
+{word: "NIFTEXDOTCOM", size: "5", colo: "#7a99d6"},
+{word: "TODAY", size: "5", colo: "#7a99d6"},
+{word: "EARN", size: "5", colo: "#7a99d6"},
+{word: "GUYS", size: "5", colo: "#7a99d6"},
+{word: "SIDDARTHA1492", size: "5", colo: "#7a99d6"},
+{word: "ERC721", size: "5", colo: "#7a99d6"},
+{word: "BREEDING", size: "4", colo: "#7a99d6"},
+{word: "MATICNETWORK", size: "4", colo: "#7a99d6"},
+{word: "YUURINB", size: "4", colo: "#7a99d6"},
+{word: "MLBCRYPTO", size: "4", colo: "#7a99d6"},
+{word: "KYBERNETWORK", size: "4", colo: "#7a99d6"},
+{word: "CATDICAX", size: "4", colo: "#7a99d6"},
+{word: "TOKEN", size: "4", colo: "#7a99d6"},
+{word: "NICE", size: "4", colo: "#7a99d6"},
+{word: "AXCATCHUM", size: "4", colo: "#7a99d6"},
+{word: "LOOM", size: "4", colo: "#7a99d6"},
+{word: "WIN", size: "4", colo: "#7a99d6"},
+{word: "COINGECKO", size: "4", colo: "#7a99d6"},
+{word: "CLOUDWHITENFT", size: "4", colo: "#7a99d6"},
+{word: "LEV0XESPORTS", size: "4", colo: "#7a99d6"},
+{word: "QUE", size: "3", colo: "#7a99d6"},
+{word: "SORAREHQ", size: "3", colo: "#7a99d6"},
+{word: "PURRBOOK", size: "3", colo: "#a3cceb"},
+{word: "SALE", size: "3", colo: "#a3cceb"},
+{word: "CHIEFTDZZL", size: "3", colo: "#a3cceb"},
+{word: "ALPHA", size: "3", colo: "#a3cceb"},
+{word: "TOMORROW", size: "3", colo: "#a3cceb"},
+{word: "WEEKLY", size: "3", colo: "#a3cceb"},
+{word: "KIYOSUIGORAKU", size: "3", colo: "#a3cceb"},
+{word: "YOUTUBE", size: "3", colo: "#a3cceb"},
+{word: "COMING", size: "3", colo: "#a3cceb"},
+{word: "CRYPTOGAMES", size: "3", colo: "#a3cceb"},
+{word: "ART", size: "3", colo: "#a3cceb"},
+{word: "FREE", size: "3", colo: "#a3cceb"},
+{word: "HOPING", size: "3", colo: "#a3cceb"},
+{word: "BLOCKCHAINGAMES", size: "3", colo: "#a3cceb"},
+{word: "AXIELIMA", size: "3", colo: "#a3cceb"},
+{word: "ENSDOMAINS", size: "3", colo: "#a3cceb"},
+{word: "OPEN", size: "3", colo: "#a3cceb"},
+{word: "MARBLECARDS", size: "3", colo: "#a3cceb"},
+{word: "DONT", size: "3", colo: "#a3cceb"},
+{word: "WAXIO", size: "3", colo: "#a3cceb"},
+{word: "AMAZING", size: "3", colo: "#a3cceb"},
+{word: "EVERDRAGONSJP", size: "3", colo: "#a3cceb"},
+{word: "WANT", size: "3", colo: "#a3cceb"},
+{word: "LOOKING", size: "3", colo: "#a3cceb"},
+{word: "TOKENS", size: "3", colo: "#a3cceb"},
+{word: "AXIEINFINITYES", size: "3", colo: "#a3cceb"},
+{word: "BOXSWAPIO", size: "3", colo: "#a3cceb"},
+{word: "MARKETPLACE", size: "3", colo: "#a3cceb"},
+{word: "PARTS", size: "3", colo: "#a3cceb"},
+{word: "SPACEPIRATEIO", size: "3", colo: "#a3cceb"},
+{word: "CRYPTOGAME", size: "3", colo: "#a3cceb"},
+{word: "KNIGHTSTORYTW", size: "3", colo: "#a3cceb"},
+{word: "VIDEO", size: "3", colo: "#a3cceb"},
+{word: "ETHAUR44", size: "3", colo: "#a3cceb"},
+{word: "SOMNIUMSPACE", size: "3", colo: "#a3cceb"},
+{word: "DAI", size: "3", colo: "#a3cceb"},
+{word: "PART", size: "3", colo: "#a3cceb"},
+{word: "SOON", size: "3", colo: "#ccffff"},
+{word: "DCLBLOGGER", size: "3", colo: "#ccffff"},
+{word: "CRYPTOINKEN", size: "3", colo: "#ccffff"},
+{word: "MARKET", size: "3", colo: "#ccffff"},
+{word: "PLAYERS", size: "3", colo: "#ccffff"},
+{word: "EGG", size: "3", colo: "#ccffff"},
+];
+
+// set the dimensions and margins of the graph
+var margin = {top: 20, right: 90, bottom: 20, left: 90},
+    width = 830 - margin.left - margin.right,
+    height = 680 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+
+
+generate_wordcloud(25);
+
+function generate_wordcloud(m){
+    x = document.getElementById("mySelect");
+    console.log(x.options)
+    console.log(x.selectedIndex)
+    console.log(x.options[x.selectedIndex].value)
+    var maximum = x.options[x.selectedIndex].value
+    console.log(maximum)
+    console.log(myWords.slice(1,maximum))
+    layout = d3.layout.cloud()
+            .size([width-50, height])
+            .words(myWords.slice(0,maximum).map(function(d) { return {text: d.word, size:d.size, color:d.colo}; }))
+            .padding(25)        //space between words
+            .rotate(function() { return ~~(Math.random() * 2) * 45; })
+            .fontSize(function(d) { return d.size; })      // font size of words
+            .on("end", draw);
+    layout.start();
+
+
+// // This function takes the output of 'layout' above and draw the words
+// // Wordcloud features that are THE SAME from one word to the other can be here
+    function draw(words) {
+        d3.select("#my_dataviz svg").remove();
+
+        var svg = d3.select("#my_dataviz").append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform",
+                        "translate(" + margin.left + "," + margin.top + ")");
+
+        var colorScale = d3.scaleLinear()
+                            .domain([0,269])
+                            .range(["#ccffff","#000099"]);
+        var legend = d3 .legendColor()
+                        .scale(colorScale)
+                        .labelFormat(d3.format(".0f"))
+                        .title("KeyWord Weight");
+        svg .append("g")
+            .attr("transform", "translate(620,540)")
+            .call(legend);
+        
+        svg
+          .append("g")
+            .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+            .selectAll("text")
+                .data(words)
+            .enter().append("text")
+                .style("font-size", function(d) { 
+                    return d.size; })
+                .style("fill", function(d) { console.log(d.color) 
+                    return d.color; })
+                .attr("text-anchor", "middle")
+                .style("font-family", "Impact")
+                .style("opacity",0.7)
+                .attr("transform", function(d) {
+                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                })
+                .text(function(d) { return d.text; })
+                .fontSize(function(d) { return d.size; });
+    }
+}
+
+</script>
